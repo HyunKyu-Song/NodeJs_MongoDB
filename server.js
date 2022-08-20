@@ -76,3 +76,32 @@ app.get('/detail/:id', function(요청, 응답){
       응답.render('detail.ejs', { data : 결과 });
    });
 });
+
+// app.post('/edit:a', function(req, res){
+//    res.send('수정되었습니다.');
+
+//    db.collection('count').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (에러, 결과) {
+//       if (에러)
+//          return console.log(에러);
+//    })
+
+//    db.collection('post').updateOne({ title: 원래값 }, { $set: { title: req.body.title } }, function (에러, 결과) {
+//       if (에러)
+//          return console.log(에러);
+//    })
+// })
+
+app.get('/edit/:a', function(req, res){
+   db.collection('post').findOne({_id : parseInt(req.params.a)}, function(err, result){
+      console.log(result);
+      res.render('edit.ejs', {data : result});
+   });
+})
+
+// app.post('/edit', function(req, res){
+//    res.send('수정');
+//    db.collection('post').find().toArray(function(err, result){
+//       res.render('edit.ejs', { posts: result });
+//       console.log('ㅁㅁㅁ');
+//    })
+// })

@@ -107,9 +107,9 @@ app.use(passport.initialize()); //미들웨어로 모든 요청과 응답 중간
 app.use(passport.session()); //미들웨어로 모든 요청과 응답 중간에 실행됨
 
 
-// app.get('/login', function (req, res) {
-//    res.render('login.ejs');
-// });
+app.get('/login', function (req, res) {
+   res.render('login.ejs');
+});
 
 app.post('/login', passport.authenticate('local', {
    failureRedirect: '/fail'
@@ -117,16 +117,16 @@ app.post('/login', passport.authenticate('local', {
    res.redirect('/')
 });
 
-app.get('/logout', function(req, res){
-   res.send('로그아웃됨~ ㅅㄱ');
-   req.logout();
-})
 
+app.get('/logout', function (req, res, next) {
+   req.logout(function (err) {
+      if (err) {
+         return next(err);
+      }
+      res.redirect('/');
+   });
+});
 
-// app.get('/mypage', login_ok, function (req, res) {
-//    console.log(req.user);
-//    res.render('mypage.ejs', { data: req.user });
-// });
 
 app.get('/mypage', login_ok, function (req, res) {
    console.log(req.user);
@@ -169,6 +169,7 @@ passport.serializeUser(function (user, done) {
    done(null, user.user_id)
 });
 
+// user.user_id가 아이디 부분에 들아감
 passport.deserializeUser(function (아이디, done) {
    db.collection('login').findOne({ user_id: 아이디 }, function (err, result) {
       done(null, result)

@@ -16,7 +16,7 @@
    <%- include('nav.html') %>
 
    <div class="container mt-4">
-      <form action="/logout" method="get" class="m-3">
+      <form class="m-3">
          <legend class="text-center mb-3">< My Page ></legend>
          <div class="form-group mb-3">
             <label for="exampleInputEmail1">사용자 아이디</label>
@@ -28,7 +28,7 @@
             <input type="text" name="content" class="form-control mt-1"  id="exampleInputEmail1"
                aria-describedby="emailHelp" placeholder="<%= user_data.user_pw %>">
          </div>
-         <a href="/logout"><button class="btn btn-danger">로그아웃</button></a>
+         <a href="/logout">로그아웃</a>
       </form>
    </div>
    

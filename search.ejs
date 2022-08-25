@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+   <title>Document</title>
+   <link rel="stylesheet" href="/public/list.css">
+
+</head>
+
+<body>
+   <%- include('nav.html') %>
+
+   <div class="container my-4">
+      <h2 class="text-center mb-3">List</h2>
+      <div class="input-group mb-2">
+         <input id="inp" class="form-control">
+         <button id="search" class="input-group-append btn btn-danger">검색</button>
+      </div>
+      <ul class="list-group">
+         <% for(var i=0; i < data.length; i++){ %>
+            <li class="list-group-item">
+               <p>No. <%= data[i]._id %>
+               </p>
+               <a class="link" href="./detail/<%= data[i]._id %>" title="상세페이지">
+                  <h4>
+                     <%= data[i].title %>
+                  </h4>
+                  <!-- <p>세부내용: <%= data[i].content %></p> -->
+               </a>
+               <a href="/edit/<%= data[i]._id %>"><button class="edit-btn btn btn-primary"
+                     data-n="<%= data[i]._id %>">수정</button></a>
+               <button class="del-btn btn btn-danger" data-num="<%= data[i]._id %>">삭제</button>
+            </li>
+         <% } %>
+      </ul>
+   </div>
+
+   <script 
+   src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous">
+      </script>
+   <script 
+   src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
+      </script>
+
+<script>
+
+   $('.del-btn').on('click', function (e) {
+      var num = e.target.dataset.num;
+      var now = $(this);
+
+      $.ajax({
+         method: 'DELETE',
+         url: '/delete',
+         data: { _id: num }
+      }).done(function (결과) {
+         console.log('성공 띠용~');
+         now.parent('li').fadeOut();
+      }).fail(function (에러) {
+         console.log('에러남!');
+      });
+   });
+
+   $('#search').click(function(){
+      var keyword = $('#inp').val();
+      window.location.replace(`/search?value=${keyword}`);
+      //현재 url을 replace 안에 적은 걸로 바꿔줌
+      //GET요청이랑 같음
+   });
+</script>
+
+</body>
+
+</html>

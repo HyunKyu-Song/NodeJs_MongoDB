@@ -13,52 +13,30 @@
 </head>
 
 <body>
-   <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-         <a class="navbar-brand" href="#">Todo App</a>
-         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-         </button>
-         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-               <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#">Home</a>
-               </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="#">Write</a>
-               </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="#">임시</a>
-               </li>
-            </ul>
-         </div>
-      </div>
-   </nav> -->
-
-   <!-- <% for(var i = 0; i < posts.length; i++){ %>
-      <p>번호: <%= posts[i]._id %></p>
-      <h4>할일: <%= posts[i].title %></h4>
-      <p>세부내용: <%= posts[i].content %></p>
-      <hr>
-   <% } %> -->
-   
    <%- include('nav.html') %>
 
    <div class="container my-4">
       <h2 class="text-center mb-3">List</h2>
+      <div class="input-group mb-2">
+         <input id="inp" class="form-control">
+         <button id="search" class="input-group-append btn btn-danger">검색</button>
+      </div>
       <ul class="list-group">
          <% for(var i=0; i < posts.length; i++){ %>
             <li class="list-group-item">
-               <p>No. <%= posts[i]._id %></p>
+               <p>No. <%= posts[i]._id %>
+               </p>
                <a class="link" href="./detail/<%= posts[i]._id %>" title="상세페이지">
-                  <h4><%= posts[i].title %></h4>
+                  <h4>
+                     <%= posts[i].title %>
+                  </h4>
                   <!-- <p>세부내용: <%= posts[i].content %></p> -->
                </a>
-               <a href="/edit/<%= posts[i]._id %>"><button class="edit-btn btn btn-primary" data-n="<%= posts[i]._id %>">수정</button></a>
+               <a href="/edit/<%= posts[i]._id %>"><button class="edit-btn btn btn-primary"
+                     data-n="<%= posts[i]._id %>">수정</button></a>
                <button class="del-btn btn btn-danger" data-num="<%= posts[i]._id %>">삭제</button>
             </li>
-            <% } %>
+         <% } %>
       </ul>
    </div>
 
@@ -85,6 +63,13 @@
          }).fail(function (에러) {
             console.log('에러남!');
          });
+      });
+
+      $('#search').click(function(){
+         var keyword = $('#inp').val();
+         window.location.replace(`/search?value=${keyword}`);
+         //현재 url을 replace 안에 적은 걸로 바꿔줌
+         //GET요청이랑 같음
       });
    </script>
 

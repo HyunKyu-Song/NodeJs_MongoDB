@@ -10,16 +10,17 @@ const methodOverride = require('method-override');
 const { render } = require('ejs');
 app.use(methodOverride('_method'));
 
+require('dotenv').config();
 
 var db;
-var 총게시물갯수;
-MongoClient.connect('mongodb+srv://song0726:song033634120@cluster0.jkh1uqu.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true }, function (에러, client) {
+
+MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function (에러, client) {
    if (에러)
       return console.log(에러);
 
    db = client.db('todoapp');
 
-   app.listen(8080, function () {
+   app.listen(process.env.PORT, function () {
       console.log('listening on 8080');
    });
 });
@@ -41,39 +42,12 @@ app.get('/write', function (req, res) {
    res.render('write.ejs');
 });
 
-app.post('/add', function (req, res) {
-   // res.send('전송완료~');
-   db.collection('count').findOne({ name: '게시물갯수' }, function (에러, 결과) {
-      console.log(결과.totalPost);
-      총게시물갯수 = 결과.totalPost;
-
-      db.collection('post').insertOne({ _id: 총게시물갯수 + 1, title: req.body.title, content: req.body.content }, function (에러, 결과) {
-         console.log('저장완료');
-
-         db.collection('count').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (에러, 결과) {
-            if (에러)
-               return console.log(에러);
-         });
-         res.redirect('/list');
-      });
-   });
-});
-
 
 app.get('/list', function (req, res) {
    db.collection('post').find().toArray(function (에러, 결과) {
       // console.log(결과);
       res.render('list.ejs', { posts: 결과 });
    });
-});
-
-app.delete('/delete', function (req, res) {
-   console.log(req.body);
-   req.body._id = parseInt(req.body._id);
-   db.collection('post').deleteOne(req.body, function (에러, 결과) {
-      console.log('삭제완료');
-      res.status(200).send({ message: '성공했습니다.' });
-   })
 });
 
 app.get('/detail/:id', function (요청, 응답) {
@@ -130,8 +104,8 @@ app.get('/logout', function (req, res, next) {
 
 app.get('/mypage', login_ok, function (req, res) {
    console.log(req.user);
-   res.render('mypage.ejs', { user_data: req.user })
-})
+   res.render('mypage.ejs', { user_data: req.user });
+});
 
 //미들웨어 만들어 사용
 //미들웨어는 모든 요청과 응답 중간에 실행됨
@@ -174,4 +148,64 @@ passport.deserializeUser(function (아이디, done) {
    db.collection('login').findOne({ user_id: 아이디 }, function (err, result) {
       done(null, result)
    })
-}); 
+});
+
+
+app.post('/register', function(req, res){
+   db.collection('login').insertOne({user_id : req.body.user_id, user_pw : req.body.user_pw}, function(err, result){
+      res.redirect('/');
+   });
+});
+
+
+app.post('/add', function (req, res) {
+   // res.send('전송완료~');
+   db.collection('count').findOne({ name: '게시물갯수' }, function (err, result) {
+      console.log(result.totalPost);
+      var 총게시물갯수 = result.totalPost;
+
+      db.collection('post').insertOne({ _id: 총게시물갯수 + 1, 작성자 : req.user._id, title: req.body.title, content: req.body.content }, function (err, result) {
+         console.log('저장완료');
+
+         db.collection('count').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (err, result) {
+            if (err)
+               return console.log(err);
+         });
+         res.redirect('/list');
+      });
+   });
+});
+
+
+app.delete('/delete', function (req, res) {
+   console.log(req.body);
+   req.body._id = parseInt(req.body._id);
+
+   var del_data = { _id : req.body._id, 작성자 : req.user._id};
+   db.collection('post').deleteOne(del_data, function (err, result) {
+      console.log('삭제완료');
+      res.status(200).send({ message: '성공했습니다.' });
+   })
+});
+
+
+app.get('/search', (req, res) => {
+   // console.log(req.query);
+   var 검색조건 = [
+      {
+         $search: {
+            index: 'titleSearch',
+            text: {
+               query: req.query.value,
+               path: 'title'  // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+            }
+         }
+      },
+      { $sort : {_id : 1} } //오름차순 정렬, 내림차순 정렬은 -1
+   ]
+   db.collection('post').aggregate(검색조건).toArray((err, result) => {
+      res.render('search.ejs', { data: result });
+      // console.log(result);
+   });
+});
+

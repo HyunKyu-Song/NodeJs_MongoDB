@@ -26,14 +26,6 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function (
 });
 
 
-app.get('/pet', function (req, res) {
-   res.send('펫용품을 볼 수 있은 페이지입니다.');
-});
-
-app.get('/beauty', function (req, res) {
-   res.send('뷰티용품 쇼핑 페이지임');
-});
-
 app.get('/', function (req, res) {
    res.render('index.ejs');
 });
@@ -50,6 +42,7 @@ app.get('/list', function (req, res) {
    });
 });
 
+
 app.get('/detail/:id', function (요청, 응답) {
    db.collection('post').findOne({ _id: parseInt(요청.params.id) }, function (에러, 결과) {
       // console.log(결과);
@@ -57,19 +50,6 @@ app.get('/detail/:id', function (요청, 응답) {
    });
 });
 
-app.get('/edit/:a', function (req, res) {
-   db.collection('post').findOne({ _id: parseInt(req.params.a) }, function (err, result) {
-      console.log(result);
-      res.render('edit.ejs', { data_edit: result });
-   });
-})
-
-app.put('/edit', function (req, res) {
-   db.collection('post').updateOne({ _id: parseInt(req.body.id) }, { $set: { title: req.body.title, content: req.body.content } }, function (err, result) {
-      console.log('수정완료~');
-      res.redirect('/list');
-   });
-});
 
 
 const passport = require('passport');
@@ -86,7 +66,8 @@ app.get('/login', function (req, res) {
 });
 
 app.post('/login', passport.authenticate('local', {
-   failureRedirect: '/fail'
+   // failureRedirect: '/fail'
+   failureRedirect: '/login'
 }), function (req, res) {
    res.redirect('/')
 });
@@ -97,7 +78,9 @@ app.get('/logout', function (req, res, next) {
       if (err) {
          return next(err);
       }
-      res.redirect('/');
+      res.write("<script>alert('Logout Complete')</script>");
+      res.write("<script>window.location.replace('/')</script>");
+      // res.redirect('/');
    });
 });
 
@@ -115,7 +98,10 @@ function login_ok(req, res, next) {
       next();  //통과했다는 뜻
    }
    else {
-      res.send('로그인 안 했음');
+      res.write("<script>alert('Please Login')</script>");
+      res.write("<script>window.location.replace('/login')</script>");
+      // res.redirect('/login');
+      // res.send('로그인 안 했음');
    }
 }
 
@@ -178,13 +164,20 @@ app.post('/add', function (req, res) {
 
 
 app.delete('/delete', function (req, res) {
-   console.log(req.body);
+   // console.log(req.body);
+   // console.log(req.body.작성자);
    req.body._id = parseInt(req.body._id);
 
    var del_data = { _id : req.body._id, 작성자 : req.user._id};
    db.collection('post').deleteOne(del_data, function (err, result) {
-      console.log('삭제완료');
-      res.status(200).send({ message: '성공했습니다.' });
+      // console.log(del_data);
+      if(req.body.작성자 == req.user._id){
+         res.status(200).send({ message: '성공했습니다.' });
+      }
+      else{
+         res.status(400).send({ message: '권한이 없음.' });
+      }
+      // console.log('삭제완료');
    })
 });
 
@@ -208,4 +201,38 @@ app.get('/search', (req, res) => {
       // console.log(result);
    });
 });
+
+app.get('/edit/:a', login_ok, function (req, res) {
+   db.collection('post').findOne({ _id: parseInt(req.params.a) }, function (err, result) {
+      // console.log(`${result.작성자}`);
+      // console.log(`${req.user._id}`);
+
+      if(`${result.작성자}` === `${req.user._id}`){
+         res.render('edit.ejs', { data_edit: result });
+         console.log('같음');
+      }
+      else{
+         res.write("<script>alert('Not authorized')</script>");
+         res.write("<script>window.location.replace('/list')</script>");
+         console.log('다름');
+      }
+   });
+})
+
+
+app.put('/edit', function (req, res) {
+   db.collection('post').updateOne({ _id: parseInt(req.body.id) }, { $set: { title: req.body.title, content: req.body.content } }, function (err, result) {
+      res.write("<script>alert('Update Complete')</script>");
+      res.write("<script>window.location.replace('/list')</script>");
+      // console.log('수정완료~');
+      // res.redirect('/list');
+   });
+});
+
+
+app.use('/shop', require('./routes/shop.js'));
+
+app.use('/board/sub', require('./routes/board.js'));
+
+
 

@@ -78,9 +78,7 @@ app.get('/logout', function (req, res, next) {
       if (err) {
          return next(err);
       }
-      res.write("<script>alert('Logout Complete')</script>");
-      res.write("<script>window.location.replace('/')</script>");
-      // res.redirect('/');
+      res.send("<script>alert('로그아웃 완료');window.location.replace('/')</script>");
    });
 });
 
@@ -98,8 +96,9 @@ function login_ok(req, res, next) {
       next();  //통과했다는 뜻
    }
    else {
-      res.write("<script>alert('Please Login')</script>");
-      res.write("<script>window.location.replace('/login')</script>");
+      res.send("<script>alert('로그인 해주세요.');window.location.replace('/login')</script>");
+      // res.write("<script>alert('Please Login')</script>");
+      // res.write("<script>window.location.replace('/login')</script>");
       // res.redirect('/login');
       // res.send('로그인 안 했음');
    }
@@ -139,7 +138,8 @@ passport.deserializeUser(function (아이디, done) {
 
 app.post('/register', function(req, res){
    db.collection('login').insertOne({user_id : req.body.user_id, user_pw : req.body.user_pw}, function(err, result){
-      res.redirect('/');
+      // res.redirect('/');
+      res.send("<script>alert('회원가입 완료');window.location.replace('/')</script>");
    });
 });
 
@@ -212,8 +212,9 @@ app.get('/edit/:a', login_ok, function (req, res) {
          console.log('같음');
       }
       else{
-         res.write("<script>alert('Not authorized')</script>");
-         res.write("<script>window.location.replace('/list')</script>");
+         res.send("<script>alert('권한이 없습니다.');window.location.replace('/list')</script>");
+         // res.write("<script>alert('Not authorized')</script>");
+         // res.write("<script>window.location.replace('/list')</script>");
          console.log('다름');
       }
    });
@@ -222,17 +223,17 @@ app.get('/edit/:a', login_ok, function (req, res) {
 
 app.put('/edit', function (req, res) {
    db.collection('post').updateOne({ _id: parseInt(req.body.id) }, { $set: { title: req.body.title, content: req.body.content } }, function (err, result) {
-      res.write("<script>alert('Update Complete')</script>");
-      res.write("<script>window.location.replace('/list')</script>");
+      res.send("<script>alert('수정 완료');window.location.replace('/list')</script>");
+      // res.write("<script>alert('Update Complete')</script>");
+      // res.write("<script>window.location.replace('/list')</script>");
       // console.log('수정완료~');
       // res.redirect('/list');
    });
 });
 
 
-app.use('/shop', require('./routes/shop.js'));
-
-app.use('/board/sub', require('./routes/board.js'));
+// app.use('/shop', require('./routes/shop.js'));
+// app.use('/board/sub', require('./routes/board.js'));
 
 
 

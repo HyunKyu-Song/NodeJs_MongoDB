@@ -236,4 +236,27 @@ app.put('/edit', function (req, res) {
 // app.use('/board/sub', require('./routes/board.js'));
 
 
+let multer = require('multer');
+var storage = multer.diskStorage({
+   destination : function(req, file, cb){
+      cb(null, './public/image')
+   },
+   filename : function(req, file, cb){
+      cb(null, file.originalname)
+   }
+});
+
+var upload = multer({storage : storage});
+
+app.get('/upload', function(req, res){
+   res.render('upload.ejs');
+});
+
+app.post('/upload', upload.single('profile'), function(req, res){
+   res.send('업로드 완료');
+});
+
+app.get('/image/:imageName', function(req, res){
+   res.sendFile(__dirname + '/public/image/' + req.params.imageName);
+})
 

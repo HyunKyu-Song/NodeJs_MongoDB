@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+   <title>Document</title>
+   <link rel="stylesheet" href="/public/list.css">
+   <style>
+      .chat-content {
+         height: 450px;
+         overflow-y: scroll;
+         padding: 10px;
+      }
+
+      .chat-content li {
+         margin-top: 10px;
+         list-style: none;
+      }
+
+      .text-small {
+         font-size: 12px;
+         color: gray;
+         margin-bottom: 0;
+      }
+
+      .chat-box {
+         background: #eee;
+         padding: 5px;
+         border-radius: 5px;
+         float: left;
+      }
+
+      .mine {
+         float: right;
+      }
+   </style>
+</head>
+
+<body>
+   <%- include('nav.html') %>
+
+      <div class="container p-4 detail">
+
+         <div class="row">
+            <div class="col-3">
+               <ul class="list-group chat-list">
+                  <li class="list-group-item" data-id="">
+                     <% for(var i = 0; i < chats.length; i++){ %>
+                        <h6><%= chats[i].title %></h6>
+                        <h6 class="text-small">채팅방설명</h6>
+                        <hr>
+                     <% } %>
+                  </li>
+               </ul>
+            </div>
+
+            <div class="col-9 p-0">
+               <div class="chat-room">
+                  <ul class="list-group chat-content">
+                     <% for(var i = 0; i < chats.length; i++){ %>
+                        <li><span class="chat-box">채팅창<br><%= chats[i].member[0]%>님과 대화내용</span></li>
+                        <hr>
+                     <% } %>
+                     
+                     <li><span class="chat-box mine">채팅방1 내용</span></li>
+                  </ul>
+                  <div class="input-group">
+                     <input class="form-control" id="chat-input">
+                     <button class="btn btn-secondary" id="send">전송</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous">
+         </script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
+         </script>
+
+      <script>
+
+
+      </script>
+
+</body>
+
+</html>

@@ -150,7 +150,7 @@ app.post('/add', function (req, res) {
       console.log(result.totalPost);
       var 총게시물갯수 = result.totalPost;
 
-      db.collection('post').insertOne({ _id: 총게시물갯수 + 1, 작성자 : req.user._id, title: req.body.title, content: req.body.content }, function (err, result) {
+      db.collection('post').insertOne({ _id: 총게시물갯수 + 1, 작성자 : req.user._id, 작성자id : req.user.user_id, title: req.body.title, content: req.body.content }, function (err, result) {
          console.log('저장완료');
 
          db.collection('count').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (err, result) {
@@ -237,6 +237,7 @@ app.put('/edit', function (req, res) {
 
 
 let multer = require('multer');
+const { request } = require('express');
 var storage = multer.diskStorage({
    destination : function(req, file, cb){
       cb(null, './public/image')
@@ -258,5 +259,40 @@ app.post('/upload', upload.single('profile'), function(req, res){
 
 app.get('/image/:imageName', function(req, res){
    res.sendFile(__dirname + '/public/image/' + req.params.imageName);
-})
+});
+
+
+app.get('/chat', function(req, res){
+   db.collection('chatroom').find().toArray(function (err, result) {
+      // console.log(result);
+      // console.log(req.body);
+      res.render('chat.ejs', { chats: result });
+   });
+});
+
+// app.post('/chat', function(req, res){
+//    console.log(Object.keys(req.body)[0]);
+//    console.log(req.user);
+//    res.redirect('list');
+// });
+
+app.post('/chat', login_ok, function(req, res){
+   db.collection('post').findOne({작성자id : Object.keys(req.body)[0]}, function(err, result){
+      db.collection('chatroom').insertOne({member : [result.작성자id, req.user.user_id], date : new Date(), title : `${result.작성자id}님과 채팅방`}, function(err, result){
+         res.redirect('/chat');
+      });
+   });
+});
+
+// app.post('/chat', function(req, res){
+//    db.collection('post').findOne({작성자id : })
+//    db.collection('chatroom').insertOne({member : [req.body.], date : , title : req.body}, function(err, result){
+//       res.send('complete!');
+//    });
+// });
+
+
+
+
+
 

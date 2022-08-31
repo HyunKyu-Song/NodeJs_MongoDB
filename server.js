@@ -263,6 +263,7 @@ app.get('/image/:imageName', function(req, res){
 
 
 app.get('/chat', function(req, res){
+   // db.collection('chatroom').find({ member : req.user.user_id}).toArray(function (err, result) {
    db.collection('chatroom').find().toArray(function (err, result) {
       // console.log(result);
       // console.log(req.body);
@@ -270,19 +271,40 @@ app.get('/chat', function(req, res){
    });
 });
 
-// app.post('/chat', function(req, res){
+// app.post('/chatroom', function(req, res){
 //    console.log(Object.keys(req.body)[0]);
-//    console.log(req.user);
+//    console.log(req.user.user_id);
+//    console.log(req.body);
+//    console.log(req.body.작성자아이디);
 //    res.redirect('list');
 // });
 
-app.post('/chat', login_ok, function(req, res){
-   db.collection('post').findOne({작성자id : Object.keys(req.body)[0]}, function(err, result){
-      db.collection('chatroom').insertOne({member : [result.작성자id, req.user.user_id], date : new Date(), title : `${result.작성자id}님과 채팅방`}, function(err, result){
-         res.redirect('/chat');
-      });
+const { ObjectId } = require('mongodb');
+
+app.post('/chatroom', login_ok, function(req, res){
+   var save = {
+      member : [ObjectId(req.body.작성자), req.user._id], 
+      date : new Date(), 
+      title : `${req.body.작성자}님과 채팅방`
+   }
+
+   db.collection('chatroom').insertOne(save, function(err, result){
+      res.redirect('/chat');
    });
 });
+
+app.post('/message', login_ok, function(req, res){
+   var 저장할거 = {
+      parent : req.body.parent, 
+      content : req.body.content, 
+      userid : req.user._id,
+      date : new Date()
+   }
+
+   db.collection('message').insertOne(저장할거, function(err, result){
+      res.send('DB저장완료');
+   })
+})
 
 // app.post('/chat', function(req, res){
 //    db.collection('post').findOne({작성자id : })

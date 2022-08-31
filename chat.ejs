@@ -48,25 +48,27 @@
          <div class="row">
             <div class="col-3">
                <ul class="list-group chat-list">
-                  <li class="list-group-item" data-id="">
-                     <% for(var i = 0; i < chats.length; i++){ %>
+                  <% for(var i=0; i < chats.length; i++){ %>
+                     <li class="list-group-item" data-id="<%= chats[i]._id %>">
                         <h6><%= chats[i].title %></h6>
                         <h6 class="text-small">채팅방설명</h6>
                         <hr>
-                     <% } %>
-                  </li>
+                     </li>
+                  <% } %>
                </ul>
             </div>
 
             <div class="col-9 p-0">
                <div class="chat-room">
                   <ul class="list-group chat-content">
-                     <% for(var i = 0; i < chats.length; i++){ %>
-                        <li><span class="chat-box">채팅창<br><%= chats[i].member[0]%>님과 대화내용</span></li>
+                     <% for(var i=0; i < chats.length; i++){ %>
+                        <li><span class="chat-box">채팅창<br>
+                              <%= chats[i].member[0]%>님과 대화내용
+                           </span></li>
                         <hr>
-                     <% } %>
-                     
-                     <li><span class="chat-box mine">채팅방1 내용</span></li>
+                        <% } %>
+
+                           <li><span class="chat-box mine">채팅방1 내용</span></li>
                   </ul>
                   <div class="input-group">
                      <input class="form-control" id="chat-input">
@@ -86,7 +88,21 @@
          </script>
 
       <script>
+         var 지금누른채팅방id;
+         $('.list-group-item').click(function () {
+            지금누른채팅방id = this.dataset.id;
+         });
 
+         $('#send').on('click', function () {
+            var 채팅내용 = $('#chat-input').val();
+            var 보낼거 = {
+               parent: 지금누른채팅방id,
+               content: 채팅내용
+            }
+            $.post('/message', 보낼거).then(function(){
+               console.log('전송완료');
+            })
+         });
 
       </script>
 

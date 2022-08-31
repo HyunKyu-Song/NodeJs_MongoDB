@@ -33,13 +33,12 @@
                      <p>작성자: <%= posts[i].작성자id %>
                      </p>
                   </a>
-                  <form action="/chat" method="post">
+                  <form action="/chatroom" method="post">
                      <a href="/edit/<%= posts[i]._id %>"><button class="edit-btn btn btn-primary"
                            data-n="<%= posts[i]._id %>" type="button">수정</button></a>
                      <button class="del-btn btn btn-danger" type="button" data-num="<%= posts[i]._id %>"
                         data-u="<%= posts[i].작성자 %>">삭제</button>
-                     <button type="submit" class="edit-btn btn btn-success"
-                           data-n="<%= posts[i]._id %>" name="<%= posts[i].작성자id %>">채팅</button>
+                     <button type="submit" class="edit-btn btn btn-success" value="<%= posts[i].작성자 %>" name="작성자">채팅</button>
                   </form>
                </li>
                <% } %>

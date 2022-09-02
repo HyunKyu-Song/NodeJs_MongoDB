@@ -136,8 +136,8 @@ passport.deserializeUser(function (아이디, done) {
 });
 
 
-app.post('/register', function(req, res){
-   db.collection('login').insertOne({user_id : req.body.user_id, user_pw : req.body.user_pw}, function(err, result){
+app.post('/register', function (req, res) {
+   db.collection('login').insertOne({ user_id: req.body.user_id, user_pw: req.body.user_pw }, function (err, result) {
       // res.redirect('/');
       res.send("<script>alert('회원가입 완료');window.location.replace('/')</script>");
    });
@@ -150,7 +150,7 @@ app.post('/add', function (req, res) {
       console.log(result.totalPost);
       var 총게시물갯수 = result.totalPost;
 
-      db.collection('post').insertOne({ _id: 총게시물갯수 + 1, 작성자 : req.user._id, 작성자id : req.user.user_id, title: req.body.title, content: req.body.content }, function (err, result) {
+      db.collection('post').insertOne({ _id: 총게시물갯수 + 1, 작성자: req.user._id, 작성자id: req.user.user_id, title: req.body.title, content: req.body.content }, function (err, result) {
          console.log('저장완료');
 
          db.collection('count').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (err, result) {
@@ -168,13 +168,13 @@ app.delete('/delete', function (req, res) {
    // console.log(req.body.작성자);
    req.body._id = parseInt(req.body._id);
 
-   var del_data = { _id : req.body._id, 작성자 : req.user._id};
+   var del_data = { _id: req.body._id, 작성자: req.user._id };
    db.collection('post').deleteOne(del_data, function (err, result) {
       // console.log(del_data);
-      if(req.body.작성자 == req.user._id){
+      if (req.body.작성자 == req.user._id) {
          res.status(200).send({ message: '성공했습니다.' });
       }
-      else{
+      else {
          res.status(400).send({ message: '권한이 없음.' });
       }
       // console.log('삭제완료');
@@ -194,7 +194,7 @@ app.get('/search', (req, res) => {
             }
          }
       },
-      { $sort : {_id : 1} } //오름차순 정렬, 내림차순 정렬은 -1
+      { $sort: { _id: 1 } } //오름차순 정렬, 내림차순 정렬은 -1
    ]
    db.collection('post').aggregate(검색조건).toArray((err, result) => {
       res.render('search.ejs', { data: result });
@@ -207,11 +207,11 @@ app.get('/edit/:a', login_ok, function (req, res) {
       // console.log(`${result.작성자}`);
       // console.log(`${req.user._id}`);
 
-      if(`${result.작성자}` === `${req.user._id}`){
+      if (`${result.작성자}` === `${req.user._id}`) {
          res.render('edit.ejs', { data_edit: result });
          console.log('같음');
       }
-      else{
+      else {
          res.send("<script>alert('권한이 없습니다.');window.location.replace('/list')</script>");
          // res.write("<script>alert('Not authorized')</script>");
          // res.write("<script>window.location.replace('/list')</script>");
@@ -239,30 +239,30 @@ app.put('/edit', function (req, res) {
 let multer = require('multer');
 const { request } = require('express');
 var storage = multer.diskStorage({
-   destination : function(req, file, cb){
+   destination: function (req, file, cb) {
       cb(null, './public/image')
    },
-   filename : function(req, file, cb){
+   filename: function (req, file, cb) {
       cb(null, file.originalname)
    }
 });
 
-var upload = multer({storage : storage});
+var upload = multer({ storage: storage });
 
-app.get('/upload', function(req, res){
+app.get('/upload', function (req, res) {
    res.render('upload.ejs');
 });
 
-app.post('/upload', upload.single('profile'), function(req, res){
+app.post('/upload', upload.single('profile'), function (req, res) {
    res.send('업로드 완료');
 });
 
-app.get('/image/:imageName', function(req, res){
+app.get('/image/:imageName', function (req, res) {
    res.sendFile(__dirname + '/public/image/' + req.params.imageName);
 });
 
 
-app.get('/chat', function(req, res){
+app.get('/chat', function (req, res) {
    // db.collection('chatroom').find({ member : req.user.user_id}).toArray(function (err, result) {
    db.collection('chatroom').find().toArray(function (err, result) {
       // console.log(result);
@@ -281,37 +281,45 @@ app.get('/chat', function(req, res){
 
 const { ObjectId } = require('mongodb');
 
-app.post('/chatroom', login_ok, function(req, res){
+app.post('/chatroom', login_ok, function (req, res) {
    var save = {
-      member : [ObjectId(req.body.작성자), req.user._id], 
-      date : new Date(), 
-      title : `${req.body.작성자}님과 채팅방`
+      member: [ObjectId(req.body.작성자), req.user._id],
+      date: new Date(),
+      title: `${req.body.작성자}님과 채팅방`
    }
 
-   db.collection('chatroom').insertOne(save, function(err, result){
+   db.collection('chatroom').insertOne(save, function (err, result) {
       res.redirect('/chat');
    });
 });
 
-app.post('/message', login_ok, function(req, res){
+app.post('/message', login_ok, function (req, res) {
    var 저장할거 = {
-      parent : req.body.parent, 
-      content : req.body.content, 
-      userid : req.user._id,
-      date : new Date()
+      parent: req.body.parent,
+      content: req.body.content,
+      userid: req.user._id,
+      date: new Date()
    }
 
-   db.collection('message').insertOne(저장할거, function(err, result){
+   db.collection('message').insertOne(저장할거, function (err, result) {
       res.send('DB저장완료');
    })
-})
+});
 
-// app.post('/chat', function(req, res){
-//    db.collection('post').findOne({작성자id : })
-//    db.collection('chatroom').insertOne({member : [req.body.], date : , title : req.body}, function(err, result){
-//       res.send('complete!');
-//    });
-// });
+
+
+app.get('/message/:id', login_ok, function (req, res) {
+   res.writeHead(200, {
+      "Connection": "keep-alive",
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+   });
+
+   db.collection('message').find({ parent: req.params.id }).toArray(function (err, result) {
+      res.write('event: test\n');
+      res.write(`data: ${JSON.stringify(result)}\n\n`);
+   })
+});
 
 
 
